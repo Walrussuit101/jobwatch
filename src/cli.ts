@@ -153,6 +153,4 @@ export class JobWatchCli {
   }
 }
 
-if (process.argv[1] === new URL(import.meta.url).pathname) {
-  new JobWatchCli().run(process.argv.slice(2));
-}
+new JobWatchCli().run(process.argv.slice(2));
