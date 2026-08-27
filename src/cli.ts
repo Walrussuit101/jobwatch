@@ -10,7 +10,7 @@ import { StatusChecker } from "./status.js";
 import { Reporter } from "./report.js";
 import { withLock } from "./lock.js";
 
-const USAGE = `jobwatch — a passive dead-man's-switch for cron jobs and backups.
+const USAGE = `jobwatch — a check-in system for cron jobs and backups.
 
 A job that runs fine emits nothing on its own; the only way to know it stopped is that
 it stops checking in. Have the job call \`jobwatch checkin\` when it finishes, and let a

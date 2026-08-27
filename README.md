@@ -1,6 +1,6 @@
 # jobwatch
 
-A passive dead-man's switch for cron jobs and backups.
+A check-in system for cron jobs and backups.
 
 A job that runs fine emits nothing on its own; the only way to know it stopped is that it stops checking in. Have the job call `jobwatch checkin` when it finishes, and let a separate periodic `jobwatch status` run report anything that's gone quiet.
 
