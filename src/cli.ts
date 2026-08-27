@@ -8,6 +8,7 @@ import { Config } from "./config.js";
 import { CheckinLog } from "./state.js";
 import { StatusChecker } from "./status.js";
 import { Reporter } from "./report.js";
+import { withLock } from "./lock.js";
 
 const USAGE = `pulse — a passive dead-man's-switch for cron jobs and backups.
 
@@ -47,9 +48,11 @@ const DEFAULT_STATE_PATH = join(homedir(), ".pulse", "state.json");
 export class PulseCli {
   /** Appends a timestamped checkin record to the state file. */
   async checkin(name: string, statePath: string): Promise<number> {
-    await mkdir(dirname(statePath), { recursive: true });
-    const line = JSON.stringify({ name, ts: Date.now() }) + "\n";
-    await appendFile(statePath, line, "utf8");
+    await withLock(statePath + ".lock", async () => {
+      await mkdir(dirname(statePath), { recursive: true });
+      const line = JSON.stringify({ name, ts: Date.now() }) + "\n";
+      await appendFile(statePath, line, "utf8");
+    });
     return 0;
   }
 
