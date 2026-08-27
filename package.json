@@ -1,6 +1,6 @@
 {
   "name": "jobwatch",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Check-in system for cron jobs and backups",
   "type": "module",
   "bin": {
@@ -23,7 +23,13 @@
   },
   "license": "MIT",
   "author": "Tim Jefferson <timjeff98@gmail.com> (https://github.com/Walrussuit101)",
-  "keywords": ["cron", "monitoring", "healthcheck", "checkin", "watchdog"],
+  "keywords": [
+    "cron",
+    "monitoring",
+    "healthcheck",
+    "checkin",
+    "watchdog"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/Walrussuit101/jobwatch.git"
