@@ -1,0 +1,8 @@
+{
+  "jobs": [
+    { "name": "nightly-backup", "every": "1d", "grace": "2h" },
+    { "name": "weekly-report",  "every": "7d", "grace": "4h" },
+    { "name": "db-vacuum",      "every": "6h", "grace": "30m" },
+    { "name": "health-ping",    "every": "5m" }
+  ]
+}

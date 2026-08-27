@@ -1,0 +1,20 @@
+{
+  "name": "pulse",
+  "version": "0.0.1",
+  "description": "Passive dead-man's switch for cron jobs and backups",
+  "type": "module",
+  "bin": {
+    "pulse": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli.js",
+    "dev": "tsx src/cli.ts",
+    "test": "node --import tsx/esm --test test/*.test.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}
