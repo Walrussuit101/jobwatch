@@ -6,7 +6,7 @@ export interface Job {
   graceMs: number;
 }
 
-/** Parsed and validated pulse job configuration. */
+/** Parsed and validated jobwatch job configuration. */
 export class Config {
   readonly jobs: Job[];
 
@@ -15,7 +15,7 @@ export class Config {
   }
 
   /**
-   * Parses and validates a pulse config JSON string.
+   * Parses and validates a jobwatch config JSON string.
    * Expected shape: { "jobs": [{ "name": "...", "every": "1d", "grace": "2h" }, ...] }
    * `grace` is optional and defaults to 0 (overdue the instant `every` elapses).
    */

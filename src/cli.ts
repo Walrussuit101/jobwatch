@@ -10,16 +10,16 @@ import { StatusChecker } from "./status.js";
 import { Reporter } from "./report.js";
 import { withLock } from "./lock.js";
 
-const USAGE = `pulse — a passive dead-man's-switch for cron jobs and backups.
+const USAGE = `jobwatch — a passive dead-man's-switch for cron jobs and backups.
 
 A job that runs fine emits nothing on its own; the only way to know it stopped is that
-it stops checking in. Have the job call \`pulse checkin\` when it finishes, and let a
-separate periodic \`pulse status\` run (a chk command check, a cron entry, whatever)
+it stops checking in. Have the job call \`jobwatch checkin\` when it finishes, and let a
+separate periodic \`jobwatch status\` run (a chk command check, a cron entry, whatever)
 report anything that's gone quiet.
 
 usage:
-  pulse checkin <name> [--state <file>]
-  pulse status --config <file> [--state <file>] [--json]
+  jobwatch checkin <name> [--state <file>]
+  jobwatch status --config <file> [--state <file>] [--json]
 
 checkin: appends a {name, ts} line to the state file, timestamped now. Run this as the
   last step of the job you're tracking.
@@ -37,15 +37,15 @@ config.json shape:
   { "jobs": [ { "name": "nightly-backup", "every": "1d", "grace": "2h" } ] }
 
 options:
-  --state     path to the state file (default: ~/.pulse/state.json)
+  --state     path to the state file (default: ~/.jobwatch/state.json)
   --json      status: emit an array of job statuses as JSON instead of a table
   -h, --help  show this
 `;
 
-const DEFAULT_STATE_PATH = join(homedir(), ".pulse", "state.json");
+const DEFAULT_STATE_PATH = join(homedir(), ".jobwatch", "state.json");
 
-/** Orchestrates the pulse CLI: dispatches commands and owns all file I/O and process exits. */
-export class PulseCli {
+/** Orchestrates the jobwatch CLI: dispatches commands and owns all file I/O and process exits. */
+export class JobWatchCli {
   /** Appends a timestamped checkin record to the state file. */
   async checkin(name: string, statePath: string): Promise<number> {
     await withLock(statePath + ".lock", async () => {
@@ -65,7 +65,7 @@ export class PulseCli {
     try {
       configText = await readFile(configPath, "utf8");
     } catch (err) {
-      process.stderr.write(`pulse: can't read ${configPath}: ${(err as Error).message}\n`);
+      process.stderr.write(`jobwatch: can't read ${configPath}: ${(err as Error).message}\n`);
       return 2;
     }
     const config = Config.parse(configText);
@@ -75,7 +75,7 @@ export class PulseCli {
       stateText = await readFile(statePath, "utf8");
     } catch (err) {
       if ((err as NodeJS.ErrnoException).code !== "ENOENT") {
-        process.stderr.write(`pulse: can't read ${statePath}: ${(err as Error).message}\n`);
+        process.stderr.write(`jobwatch: can't read ${statePath}: ${(err as Error).message}\n`);
         return 2;
       }
     }
@@ -118,7 +118,7 @@ export class PulseCli {
       try {
         process.exit(await this.checkin(name, statePath));
       } catch (err) {
-        process.stderr.write(`pulse: ${(err as Error).message}\n`);
+        process.stderr.write(`jobwatch: ${(err as Error).message}\n`);
         process.exit(2);
       }
     } else if (command === "status") {
@@ -143,7 +143,7 @@ export class PulseCli {
       try {
         process.exit(await this.status(values.config, statePath, values.json ?? false));
       } catch (err) {
-        process.stderr.write(`pulse: ${(err as Error).message}\n`);
+        process.stderr.write(`jobwatch: ${(err as Error).message}\n`);
         process.exit(2);
       }
     } else {
@@ -154,5 +154,5 @@ export class PulseCli {
 }
 
 if (process.argv[1] === new URL(import.meta.url).pathname) {
-  new PulseCli().run(process.argv.slice(2));
+  new JobWatchCli().run(process.argv.slice(2));
 }

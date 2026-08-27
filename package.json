@@ -1,17 +1,34 @@
 {
-  "name": "pulse",
-  "version": "0.0.1",
+  "name": "jobwatch",
+  "version": "1.0.0",
   "description": "Passive dead-man's switch for cron jobs and backups",
   "type": "module",
   "bin": {
-    "pulse": "dist/cli.js"
+    "jobwatch": "dist/cli.js"
+  },
+  "files": [
+    "dist/",
+    "example.config.json"
+  ],
+  "engines": {
+    "node": ">=18"
   },
   "scripts": {
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test",
     "build": "tsc",
     "start": "node dist/cli.js",
     "dev": "tsx src/cli.ts",
-    "test": "node --import tsx/esm --test test/*.test.ts"
+    "test": "tsx --test test/*.test.ts"
   },
+  "license": "MIT",
+  "author": "Tim Jefferson <timjeff98@gmail.com> (https://github.com/Walrussuit101)",
+  "keywords": ["cron", "monitoring", "dead-man-switch", "healthcheck", "checkin", "watchdog"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Walrussuit101/jobwatch.git"
+  },
+  "homepage": "https://github.com/Walrussuit101/jobwatch#readme",
   "devDependencies": {
     "@types/node": "^26.1.2",
     "tsx": "^4.19.2",

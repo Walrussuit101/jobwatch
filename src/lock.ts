@@ -1,4 +1,5 @@
-import { open, readFile, stat, unlink } from "node:fs/promises";
+import { mkdir, open, readFile, stat, unlink } from "node:fs/promises";
+import { dirname } from "node:path";
 
 export interface LockOptions {
   retryIntervalMs?: number;
@@ -26,6 +27,7 @@ export async function withLock<T>(
   const timeoutMs = opts?.timeoutMs ?? 5_000;
   const staleAfterMs = opts?.staleAfterMs ?? 30_000;
 
+  await mkdir(dirname(lockPath), { recursive: true });
   await acquire(lockPath, Date.now() + timeoutMs, retryIntervalMs, staleAfterMs, timeoutMs);
   try {
     return await fn();

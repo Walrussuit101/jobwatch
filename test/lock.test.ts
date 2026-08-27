@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { appendFile, mkdir, readFile, rm, unlink, utimes, writeFile } from "node:fs/promises";
 import { withLock, LockTimeoutError } from "../src/lock.js";
 
-const TMP = join(tmpdir(), `pulse-lock-test-${process.pid}`);
+const TMP = join(tmpdir(), `jobwatch-lock-test-${process.pid}`);
 await mkdir(TMP, { recursive: true });
 
 after(async () => {
@@ -74,6 +74,14 @@ describe("Lock", () => {
       staleAfterMs: 30_000,
     });
     assert.ok(ran);
+  });
+
+  test("creates parent directory if it does not exist", async () => {
+    const lockPath = join(TMP, "newdir", "nested.lock");
+    let ran = false;
+    await withLock(lockPath, async () => { ran = true; });
+    assert.ok(ran);
+    await assert.rejects(() => readFile(lockPath), { code: "ENOENT" });
   });
 
   test("throws LockTimeoutError when lock is held by a live process", async () => {
