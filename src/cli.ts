@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { parseArgs } from "node:util";
+import { createRequire } from "node:module";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { appendFile, mkdir, readFile } from "node:fs/promises";
@@ -39,10 +40,17 @@ config.json shape:
 options:
   --state     path to the state file (default: ~/.jobwatch/state.json)
   --json      status: emit an array of job statuses as JSON instead of a table
+  -v, --version  print the jobwatch version and exit
   -h, --help  show this
 `;
 
 const DEFAULT_STATE_PATH = join(homedir(), ".jobwatch", "state.json");
+
+/** Reads this package's version from its package.json, resolved relative to this module. */
+function version(): string {
+  const pkg = createRequire(import.meta.url)("../package.json") as { version: string };
+  return pkg.version;
+}
 
 /** Orchestrates the jobwatch CLI: dispatches commands and owns all file I/O and process exits. */
 export class JobWatchCli {
@@ -88,6 +96,11 @@ export class JobWatchCli {
 
   /** Parses argv and dispatches to the appropriate command. */
   async run(argv: string[]): Promise<void> {
+    if (argv[0] === "-v" || argv[0] === "--version") {
+      process.stdout.write(version() + "\n");
+      process.exit(0);
+    }
+
     if (argv[0] === "-h" || argv[0] === "--help" || argv.length === 0) {
       process.stdout.write(USAGE);
       process.exit(argv.length === 0 ? 2 : 0);
