@@ -20,7 +20,7 @@ report anything that's gone quiet.
 
 usage:
   jobwatch checkin <name> [--state <file>]
-  jobwatch status --config <file> [--state <file>] [--json]
+  jobwatch status [--config <file>] [--state <file>] [--json]
 
 checkin: appends a {name, ts} line to the state file, timestamped now. Run this as the
   last step of the job you're tracking.
@@ -38,6 +38,7 @@ config.json shape:
   { "jobs": [ { "name": "nightly-backup", "every": "1d", "grace": "2h" } ] }
 
 options:
+  --config    path to the config file (default: ~/.jobwatch/config.json)
   --state     path to the state file (default: ~/.jobwatch/state.json)
   --json      status: emit an array of job statuses as JSON instead of a table
   -v, --version  print the jobwatch version and exit
@@ -45,6 +46,7 @@ options:
 `;
 
 const DEFAULT_STATE_PATH = join(homedir(), ".jobwatch", "state.json");
+const DEFAULT_CONFIG_PATH = join(homedir(), ".jobwatch", "config.json");
 
 /** Reads this package's version from its package.json, resolved relative to this module. */
 function version(): string {
@@ -148,13 +150,10 @@ export class JobWatchCli {
         process.stdout.write(USAGE);
         process.exit(0);
       }
-      if (!values.config) {
-        process.stderr.write(USAGE);
-        process.exit(2);
-      }
+      const configPath = values.config ?? DEFAULT_CONFIG_PATH;
       const statePath = values.state ?? DEFAULT_STATE_PATH;
       try {
-        process.exit(await this.status(values.config, statePath, values.json ?? false));
+        process.exit(await this.status(configPath, statePath, values.json ?? false));
       } catch (err) {
         process.stderr.write(`jobwatch: ${(err as Error).message}\n`);
         process.exit(2);

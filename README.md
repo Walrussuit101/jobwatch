@@ -7,7 +7,7 @@ A job that runs fine emits nothing on its own; the only way to know it stopped i
 ## How it works
 
 1. At the end of each job you want to monitor, call `jobwatch checkin <name>`. This appends a timestamped record to a state file (default: `~/.jobwatch/state.json`).
-2. Run `jobwatch status --config <file>` on a schedule (via cron, a monitoring check, etc.). It reads your config to know what jobs to expect and how often, then reports each job as `OK`, `OVERDUE`, or `NEVER`.
+2. Run `jobwatch status` on a schedule (via cron, a monitoring check, etc.). It reads your config (default: `~/.jobwatch/config.json`) to know what jobs to expect and how often, then reports each job as `OK`, `OVERDUE`, or `NEVER`.
 3. `jobwatch status` exits 0 if everything is OK, 1 if any job is overdue or has never checked in — so it composes directly as a cron job or a monitoring command check.
 
 ## Installation
@@ -27,7 +27,8 @@ npm run build
 
 ```
 jobwatch checkin <name> [--state <file>]
-jobwatch status --config <file> [--state <file>] [--json]
+jobwatch status [--config <file>] [--state <file>] [--json]
+jobwatch --version
 ```
 
 ### `jobwatch checkin <name>`
@@ -42,7 +43,7 @@ rsync -a /data /backup && jobwatch checkin nightly-backup
 Options:
 - `--state <file>` — path to the state file (default: `~/.jobwatch/state.json`)
 
-### `jobwatch status --config <file>`
+### `jobwatch status`
 
 Reads the config to find expected jobs and the state file to find actual checkins, then reports each job's health.
 
@@ -53,7 +54,7 @@ db-vacuum       NEVER   no checkin seen
 ```
 
 Options:
-- `--config <file>` — path to your config JSON (required)
+- `--config <file>` — path to your config JSON (default: `~/.jobwatch/config.json`)
 - `--state <file>` — path to the state file (default: `~/.jobwatch/state.json`)
 - `--json` — emit results as a JSON array instead of a table
 
@@ -61,6 +62,14 @@ Exit codes:
 - `0` — all jobs are OK
 - `1` — one or more jobs are OVERDUE or NEVER
 - `2` — usage error or I/O failure
+
+### `jobwatch --version`
+
+Prints the installed version and exits.
+
+```sh
+jobwatch --version   # or: jobwatch -v
+```
 
 ## Config file
 
@@ -97,8 +106,8 @@ Duration format: a number followed by a unit — `ms`, `s`, `m`, `h`, or `d`. No
 # The job itself — checkin when done
 0 2 * * * /path/to/backup.sh && jobwatch checkin nightly-backup
 
-# A watchdog — alert if anything is overdue
-*/15 * * * * jobwatch status --config /etc/jobwatch.json || alert "jobwatch: job overdue"
+# A watchdog — alert if anything is overdue (uses ~/.jobwatch/config.json by default)
+*/15 * * * * jobwatch status || alert "jobwatch: job overdue"
 ```
 
 ## Development
